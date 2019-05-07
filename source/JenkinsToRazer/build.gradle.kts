@@ -4,6 +4,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven { url = uri("https://kotlin.bintray.com/ktor") }
 }
 
 kotlin {
@@ -23,6 +24,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
+                implementation("io.ktor:ktor-client-core:1.1.5")
             }
         }
 
