@@ -1,4 +1,8 @@
+import kotlinx.coroutines.runBlocking
+
 fun main(){
-    val client = MyClient()
-    client.execute()
+    runBlocking {
+        val client = JenkinsClient()
+        client.execute()
+    }
 }

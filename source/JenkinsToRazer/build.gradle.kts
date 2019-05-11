@@ -18,14 +18,14 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                api("io.ktor:ktor-client-core:1.1.5")
+                implementation("io.ktor:ktor-client-core:1.1.5")
             }
         }
 
         val linuxMain by getting {
             dependsOn(commonMain)
             dependencies {
-                api("io.ktor:ktor-client-curl:1.1.5")
+                implementation("io.ktor:ktor-client-curl:1.1.5")
             }
         }
     }
