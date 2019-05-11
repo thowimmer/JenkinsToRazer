@@ -28,7 +28,12 @@ kotlin {
             }
         }
 
-        linuxX64("linux").compilations["main"].defaultSourceSet  { /* ... */ }
-        mingwX64("windows").compilations["main"].defaultSourceSet  { /* ... */ }
+        val linuxMain by getting {
+            dependsOn(commonMain)
+        }
+
+        val windowsMain by getting {
+            dependsOn(commonMain)
+        }
     }
 }
