@@ -1,6 +1,6 @@
 import io.ktor.client.*
 
-class JenkinsClient {
+class MyClient {
 
     private val client = HttpClient()
 

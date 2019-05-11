@@ -1,4 +1,4 @@
 fun main(){
-    val client = JenkinsClient()
+    val client = MyClient()
     client.execute()
 }
