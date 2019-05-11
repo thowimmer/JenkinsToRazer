@@ -14,26 +14,19 @@ kotlin {
         }
     }
 
-    mingwX64("windows") {
-        binaries {
-            executable()
-        }
-    }
-
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation("io.ktor:ktor-client-core:1.1.5")
+                api("io.ktor:ktor-client-core:1.1.5")
             }
         }
 
         val linuxMain by getting {
             dependsOn(commonMain)
-        }
-
-        val windowsMain by getting {
-            dependsOn(commonMain)
+            dependencies {
+                api("io.ktor:ktor-client-curl:1.1.5")
+            }
         }
     }
 }

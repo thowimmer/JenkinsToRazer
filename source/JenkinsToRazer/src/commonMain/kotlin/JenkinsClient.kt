@@ -1,10 +1,10 @@
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 
 class JenkinsClient {
 
+    private val client = HttpClient()
+
     fun execute() {
-        println("Execute...")
-        val client = HttpClient()
-        //do something with client
+        //do something with Ktor client
     }
 }
