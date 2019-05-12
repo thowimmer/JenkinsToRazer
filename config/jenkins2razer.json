@@ -1,0 +1,12 @@
+{
+  "jenkins": {
+    "url": "some.jenkins.url/somepath",
+    "auth": {
+      "username": "someuser",
+      "password": "somepassword"
+    },
+    "job": {
+      "id": "some-job-id"
+    }
+  }
+}
