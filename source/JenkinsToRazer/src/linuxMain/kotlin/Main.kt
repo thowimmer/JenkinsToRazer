@@ -3,6 +3,7 @@ import kotlinx.coroutines.runBlocking
 fun main(){
     runBlocking {
         val client = JenkinsClient()
-        client.execute()
+        val buildInfo = client.getLastSuccessfulBuildInfo()
+        print(buildInfo)
     }
 }

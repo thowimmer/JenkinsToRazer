@@ -1,10 +1,16 @@
+val ktorVersion = "1.1.5"
+val kotlinxSerializationVersion = "0.11.0"
+
+
 plugins {
-    kotlin("multiplatform") version "1.3.31"
+    id("kotlin-multiplatform") version "1.3.31"
+    id("kotlinx-serialization") version "1.3.31"
 }
 
 repositories {
     mavenCentral()
     maven { url = uri("https://kotlin.bintray.com/ktor") }
+    maven { url = uri("https://kotlin.bintray.com/kotlinx") }
 }
 
 kotlin {
@@ -18,14 +24,17 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation("io.ktor:ktor-client-core:1.1.5")
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-json:$ktorVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$kotlinxSerializationVersion")
             }
         }
 
         val linuxMain by getting {
             dependsOn(commonMain)
             dependencies {
-                implementation("io.ktor:ktor-client-curl:1.1.5")
+                implementation("io.ktor:ktor-client-curl:$ktorVersion")
+                implementation("io.ktor:ktor-client-json-native:$ktorVersion")
             }
         }
     }
