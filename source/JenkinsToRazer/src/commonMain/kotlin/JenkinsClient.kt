@@ -11,27 +11,22 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 
-class JenkinsClient {
+class JenkinsClient(val config : JenkinsConfiguration) {
 
     @UseExperimental(UnstableDefault::class)
     val client = HttpClient {
         install(JsonFeature) {
             serializer = KotlinxSerializer(Json.nonstrict).apply {
-                setMapper(LastSuccessfulJobBuildInfo::class, LastSuccessfulJobBuildInfo.serializer())
+                setMapper(LastJobBuildInfo::class, LastJobBuildInfo.serializer())
             }
         }
     }
 
     @UseExperimental(InternalAPI::class)
-    suspend fun getLastSuccessfulBuildInfo() : LastSuccessfulJobBuildInfo{
-        val userName = "TODO file configuration"
-        val password = "TODO file configuration"
-        val jenkinsUrl = "TODO file configuration"
-        val jobId = "TODO file configuration"
-
-        val buildInfo : LastSuccessfulJobBuildInfo = client.get {
-            url(getLastSuccessfulBuildUrl(jenkinsUrl, jobId))
-            header("Authorization", "Basic " + "$userName:$password".encodeBase64())
+    suspend fun getBuildInfoOfLastJob() : LastJobBuildInfo{
+        val buildInfo : LastJobBuildInfo = client.get {
+            url(getLastSuccessfulBuildUrl(config.url, config.job.id))
+            header("Authorization", "Basic " + "${config.auth.username}:${config.auth.password}".encodeBase64())
         }
         client.close()
 
@@ -42,7 +37,7 @@ class JenkinsClient {
 }
 
 @Serializable
-data class LastSuccessfulJobBuildInfo(
+data class LastJobBuildInfo(
         val id: Long,
         val url: String,
         val timestamp: Long,
