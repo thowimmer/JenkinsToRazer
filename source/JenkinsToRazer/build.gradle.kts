@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 val ktorVersion = "1.1.5"
 val kotlinxSerializationVersion = "0.11.0"
 
@@ -16,6 +18,14 @@ repositories {
 kotlin {
     linuxX64("linux") {
         binaries {
+            if(Os.isFamily(Os.FAMILY_UNIX)){
+                executable()
+            }
+        }
+    }
+
+    mingwX64("windows") {
+        binaries {
             executable()
         }
     }
@@ -31,6 +41,14 @@ kotlin {
         }
 
         val linuxMain by getting {
+            dependsOn(commonMain)
+            dependencies {
+                implementation("io.ktor:ktor-client-curl:$ktorVersion")
+                implementation("io.ktor:ktor-client-json-native:$ktorVersion")
+            }
+        }
+
+        val windowsMain by getting {
             dependsOn(commonMain)
             dependencies {
                 implementation("io.ktor:ktor-client-curl:$ktorVersion")
