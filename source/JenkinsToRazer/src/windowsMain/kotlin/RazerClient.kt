@@ -13,6 +13,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
+import platform.posix.sleep
 
 class RazerClient {
 
@@ -37,7 +38,7 @@ class RazerClient {
     suspend fun run(){
         while (isActive){
             callHeartbeat()
-            delay(1000)
+            sleep(2)
         }
     }
 

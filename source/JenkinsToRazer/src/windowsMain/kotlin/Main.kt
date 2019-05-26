@@ -3,10 +3,7 @@ import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.toKString
 import kotlinx.coroutines.*
-import platform.posix.fclose
-import platform.posix.fgets
-import platform.posix.fopen
-import platform.posix.getenv
+import platform.posix.*
 
 @InternalCoroutinesApi
 fun main(){
@@ -22,7 +19,7 @@ fun main(){
             val colorValues = listOf(255, 42495, 0)
             while (isActive){
                 razerClient.setColor(colorValues.shuffled().first())
-                delay(1000)
+                sleep(1)
             }
         }
     }
