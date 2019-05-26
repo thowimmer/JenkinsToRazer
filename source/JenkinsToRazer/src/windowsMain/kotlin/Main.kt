@@ -16,7 +16,7 @@ fun main(){
         }
 
         launch {
-            val colorValues = listOf(255, 42495, 0)
+            val colorValues = listOf(16711680, 65280, 255)
             while (isActive){
                 razerClient.setColor(colorValues.shuffled().first())
                 sleep(1)

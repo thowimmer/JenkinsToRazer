@@ -38,7 +38,7 @@ class RazerClient {
     suspend fun run(){
         while (isActive){
             callHeartbeat()
-            sleep(2)
+            sleep(1)
         }
     }
 
