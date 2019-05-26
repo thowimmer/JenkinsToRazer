@@ -53,6 +53,7 @@ kotlin {
             dependencies {
                 implementation("io.ktor:ktor-client-curl:$ktorVersion")
                 implementation("io.ktor:ktor-client-json-native:$ktorVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:$kotlinxSerializationVersion")
             }
         }
     }
