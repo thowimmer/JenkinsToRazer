@@ -19,13 +19,13 @@ fun main(){
             val colorValues = listOf(16711680, 65280, 255)
             while (isActive){
                 razerClient.setColor(colorValues.shuffled().first())
-                sleep(1)
+                delayOnPlatform(1000)
             }
         }
     }
 }
 
-internal actual fun loadConfigurationPropertiesJson(): String = readTextContent(getConfigurationFilePath())
+actual fun loadConfigurationPropertiesJson(): String = readTextContent(getConfigurationFilePath())
 
 fun getConfigurationFilePath() : String {
     val userHome = getenv("USERPROFILE")?.toKString() ?: throw IllegalStateException("Userhome not found.")
@@ -57,4 +57,9 @@ fun readTextContent(filePath :String) : String {
     }
 
     return stringBuilder.toString()
+}
+
+@UseExperimental(ExperimentalUnsignedTypes::class)
+actual suspend fun delayOnPlatform(timeMillis: Long) {
+    usleep(timeMillis.convert<__useconds_t>() * 1000U)
 }

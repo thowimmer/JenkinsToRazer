@@ -18,7 +18,4 @@ class ConfigurationLoader {
         val configurationPropertiesJson = loadConfigurationPropertiesJson()
         return Json.parse(ConfigurationProperties.serializer(), configurationPropertiesJson)
     }
-
 }
-
-internal expect fun loadConfigurationPropertiesJson() : String

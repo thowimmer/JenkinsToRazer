@@ -12,7 +12,7 @@ fun main(){
     }
 }
 
-internal actual fun loadConfigurationPropertiesJson(): String = readTextContent(getConfigurationFilePath())
+actual fun loadConfigurationPropertiesJson(): String = readTextContent(getConfigurationFilePath())
 
 fun getConfigurationFilePath() : String {
     val passwd = getpwuid(getuid())
@@ -44,4 +44,9 @@ fun readTextContent(filePath :String) : String {
     }
 
     return stringBuilder.toString()
+}
+
+@UseExperimental(ExperimentalUnsignedTypes::class)
+actual suspend fun delayOnPlatform(timeMillis: Long) {
+    usleep(timeMillis.convert<__useconds_t>() * 1000U)
 }
