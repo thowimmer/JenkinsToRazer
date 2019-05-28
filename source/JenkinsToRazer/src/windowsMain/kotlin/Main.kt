@@ -1,7 +1,4 @@
-import kotlinx.cinterop.ByteVar
-import kotlinx.cinterop.allocArray
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.toKString
+import kotlinx.cinterop.*
 import kotlinx.coroutines.*
 import platform.posix.*
 
@@ -61,5 +58,5 @@ fun readTextContent(filePath :String) : String {
 
 @UseExperimental(ExperimentalUnsignedTypes::class)
 actual suspend fun delayOnPlatform(timeMillis: Long) {
-    usleep(timeMillis.convert<__useconds_t>() * 1000U)
+    usleep(timeMillis.convert<useconds_t>() * 1000U)
 }
