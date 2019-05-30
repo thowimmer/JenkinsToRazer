@@ -15,7 +15,7 @@ fun main(){
         launch {
             val colorValues = listOf(16711680, 65280, 255)
             while (isActive){
-                razerClient.setColor(colorValues.shuffled().first())
+                println("OLLA")
                 delayOnPlatform(1000)
             }
         }
@@ -58,5 +58,10 @@ fun readTextContent(filePath :String) : String {
 
 @UseExperimental(ExperimentalUnsignedTypes::class)
 actual suspend fun delayOnPlatform(timeMillis: Long) {
-    usleep(timeMillis.convert<useconds_t>() * 1000U)
+    memScoped {
+        val timespec = alloc<timespec>()
+        timespec.tv_sec = timeMillis / 1000
+        timespec.tv_nsec = ((timeMillis % 1000L) * 1000000L).convert()
+        nanosleep(timespec.ptr, null)
+    }
 }
