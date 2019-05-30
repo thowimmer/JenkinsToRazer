@@ -1,24 +1,22 @@
 import io.ktor.client.HttpClient
+import io.ktor.client.call.call
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.url
-import io.ktor.content.TextContent
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import kotlinx.coroutines.*
-import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
-import platform.posix.sleep
 
 private val MAX_ROWS = 6
 private val MAX_COLUMNS = 22
 private val KEY_BITMASK =  0x01000000
-private val LOOP_INITERVAL_MILLIS = 100L
+private val LOOP_INITERVAL_MILLIS = 50L
 private val HEARBEAT_INTERVAL_MILLIS = 1000L
 
 class RazerClient {
@@ -59,11 +57,11 @@ class RazerClient {
         }
     }
 
-    suspend fun setKey(colorHex: String, rowIndex: Int, columnIndex: Int){
+    fun setKey(colorHex: String, rowIndex: Int, columnIndex: Int){
         currentEffect.key[rowIndex][columnIndex] = colorHex.toBgr() or KEY_BITMASK
     }
 
-    suspend fun setBackgroundColor (colorHex: String) {
+    fun setBackgroundColor (colorHex: String) {
         currentEffect.color = Array(MAX_ROWS) {Array(MAX_COLUMNS) {colorHex.toBgr()} }
     }
 
@@ -81,20 +79,17 @@ class RazerClient {
             }
 
     private suspend fun callHeartbeatEndpoint() {
-        val response = client.put<String>("$sessionUri/heartbeat")
-        println("Heartbeat Response: $response")
+        client.call("$sessionUri/heartbeat"){
+            method = HttpMethod.Put
+        }
     }
 
     private suspend fun callCustomEffectEndpoint(){
-        val request = CustomKeyKeyBoardEffectRequest(param = currentEffect)
-
-        val response = client.put<String>{
-            url("$sessionUri/keyboard")
+        client.call("$sessionUri/keyboard"){
+            method = HttpMethod.Put
             contentType(ContentType.Application.Json)
-            body = request
+            body = CustomKeyKeyBoardEffectRequest(param = currentEffect)
         }
-
-        println("Custom Key Response: $response")
     }
 }
 
