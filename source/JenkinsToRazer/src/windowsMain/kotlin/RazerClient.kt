@@ -15,9 +15,17 @@ import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import platform.posix.sleep
 
+private val MAX_ROWS = 6
+private val MAX_COLUMNS = 22
+private val KEY_BITMASK =  0x01000000
+private val LOOP_INITERVAL_MILLIS = 50L
+private val HEARBEAT_INTERVAL_MILLIS = 1000L
+
 class RazerClient {
 
     private lateinit var sessionUri: String
+
+    private val currentEffect = CustomKeyKeyBoardEffectRequest.CustomKeyBoardEffectParams()
 
     @UseExperimental(UnstableDefault::class)
     private val client = HttpClient {
@@ -25,25 +33,32 @@ class RazerClient {
             serializer = KotlinxSerializer(Json.nonstrict).apply {
                 setMapper(InitializationRequest::class, InitializationRequest.serializer())
                 setMapper(InitializationResponse::class, InitializationResponse.serializer())
+                setMapper(CustomKeyKeyBoardEffectRequest::class, CustomKeyKeyBoardEffectRequest.serializer())
             }
         }
     }
 
     suspend fun init(){
         val initResponse = callRazerSdkInitialization()
+        println(initResponse)
         sessionUri = initResponse.uri
     }
 
     @InternalCoroutinesApi
     suspend fun run(){
         while (isActive){
-            callHeartbeat()
-            delayOnPlatform(1000)
+            callHeartbeatEndpoint()
+            delayOnPlatform(HEARBEAT_INTERVAL_MILLIS)
         }
     }
 
-    suspend fun setColor (color: Int) {
-        callSetStaticColor(color)
+    suspend fun setKey(colorHex: String, rowIndex: Int, columnIndex: Int){
+        currentEffect.key[rowIndex][columnIndex] = colorHex.toBgr() or KEY_BITMASK
+        callCustomEffectEndpoint()
+    }
+
+    suspend fun setBackgroundColor (colorHex: String) {
+        currentEffect.color = Array(MAX_ROWS) {Array(MAX_COLUMNS) {colorHex.toBgr()} }
     }
 
     private suspend fun callRazerSdkInitialization() : InitializationResponse =
@@ -59,17 +74,21 @@ class RazerClient {
                 )
             }
 
-    private suspend fun callHeartbeat() {
+    private suspend fun callHeartbeatEndpoint() {
         val response = client.put<String>("$sessionUri/heartbeat")
         println("Heartbeat Response: $response")
     }
 
-    private suspend fun callSetStaticColor(color : Int) {
-        val response = client.put<String> {
+    private suspend fun callCustomEffectEndpoint(){
+        val request = CustomKeyKeyBoardEffectRequest(param = currentEffect)
+
+        val response = client.put<String>{
             url("$sessionUri/keyboard")
-            body = TextContent("{\"effect\":\"CHROMA_STATIC\",\"param\":{\"color\":$color}}", contentType = ContentType.Application.Json)
+            contentType(ContentType.Application.Json)
+            body = request
         }
-        println("Static Color Response: $response")
+
+        println("Custom Key Response: $response")
     }
 }
 
@@ -94,3 +113,23 @@ data class InitializationResponse(
         val uri: String
 
 )
+
+@Serializable
+data class CustomKeyKeyBoardEffectRequest(
+        val effect : String = "CHROMA_CUSTOM_KEY",
+        val param: CustomKeyBoardEffectParams
+){
+    @Serializable
+    data class CustomKeyBoardEffectParams(
+            var color: Array<Array<Int>> = Array(MAX_ROWS) {Array(MAX_COLUMNS) {0} },
+            var key: Array<Array<Int>> = Array(MAX_ROWS) {Array(MAX_COLUMNS) {0} }
+    )
+}
+
+private fun String.toBgr() : Int {
+    val rgb = this.toInt(radix = 16)
+    val r = (rgb and 0xFF0000)
+    val g = (rgb and 0x00FF00)
+    val b = (rgb and 0x0000FF)
+    return (b shl 16) or g or (r shr 16)
+}

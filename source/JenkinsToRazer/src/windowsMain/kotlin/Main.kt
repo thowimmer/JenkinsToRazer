@@ -13,9 +13,16 @@ fun main(){
         }
 
         launch {
-            val colorValues = listOf(16711680, 65280, 255)
+            val rowIndexRange = (0..5)
+            val columnIndexRange = (0..21)
+
+            razerClient.setBackgroundColor("0000FF")
             while (isActive){
-                razerClient.setColor(colorValues.shuffled().first())
+                val randomRowIndex = rowIndexRange.shuffled().first()
+                val randomColumnIndex = columnIndexRange.shuffled().first()
+
+                razerClient.setKey("00FF00", randomRowIndex, randomColumnIndex)
+
                 delayOnPlatform(1000)
             }
         }
