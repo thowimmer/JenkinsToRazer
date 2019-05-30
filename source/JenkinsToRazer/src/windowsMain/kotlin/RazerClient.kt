@@ -18,7 +18,7 @@ import platform.posix.sleep
 private val MAX_ROWS = 6
 private val MAX_COLUMNS = 22
 private val KEY_BITMASK =  0x01000000
-private val LOOP_INITERVAL_MILLIS = 50L
+private val LOOP_INITERVAL_MILLIS = 100L
 private val HEARBEAT_INTERVAL_MILLIS = 1000L
 
 class RazerClient {
@@ -45,16 +45,22 @@ class RazerClient {
     }
 
     @InternalCoroutinesApi
-    suspend fun run(){
+    suspend fun run() = coroutineScope{
+        var ticksWithoutHeartbeat = 0
         while (isActive){
-            callHeartbeatEndpoint()
-            delayOnPlatform(HEARBEAT_INTERVAL_MILLIS)
+            if(ticksWithoutHeartbeat * LOOP_INITERVAL_MILLIS >= HEARBEAT_INTERVAL_MILLIS){
+                launch { callHeartbeatEndpoint() }
+                ticksWithoutHeartbeat = 0
+            }else{
+                ticksWithoutHeartbeat++
+            }
+            callCustomEffectEndpoint()
+            delay(LOOP_INITERVAL_MILLIS)
         }
     }
 
     suspend fun setKey(colorHex: String, rowIndex: Int, columnIndex: Int){
         currentEffect.key[rowIndex][columnIndex] = colorHex.toBgr() or KEY_BITMASK
-        callCustomEffectEndpoint()
     }
 
     suspend fun setBackgroundColor (colorHex: String) {

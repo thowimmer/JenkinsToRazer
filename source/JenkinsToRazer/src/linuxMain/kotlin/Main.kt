@@ -45,13 +45,3 @@ fun readTextContent(filePath :String) : String {
 
     return stringBuilder.toString()
 }
-
-@UseExperimental(ExperimentalUnsignedTypes::class)
-actual suspend fun delayOnPlatform(timeMillis: Long) {
-    memScoped {
-        val timespec = alloc<timespec>()
-        timespec.tv_sec = timeMillis / 1000
-        timespec.tv_nsec = ((timeMillis % 1000L) * 1000000L).convert()
-        nanosleep(timespec.ptr, null)
-    }
-}
