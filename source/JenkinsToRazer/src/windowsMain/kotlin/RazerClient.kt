@@ -13,11 +13,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 
-private val MAX_ROWS = 6
-private val MAX_COLUMNS = 22
-private val KEY_BITMASK =  0x01000000
-private val LOOP_INITERVAL_MILLIS = 50L
-private val HEARBEAT_INTERVAL_MILLIS = 1000L
+private const val MAX_ROWS = 6
+private const val MAX_COLUMNS = 22
+private const val KEY_BITMASK =  0x01000000
+private const val LOOP_INITERVAL_MILLIS = 50L
+private const val HEARTBEAT_INTERVAL_MILLIS = 1000L
 
 class RazerClient {
 
@@ -36,17 +36,15 @@ class RazerClient {
         }
     }
 
-    suspend fun init(){
+    @InternalCoroutinesApi
+    suspend fun run() = coroutineScope{
         val initResponse = callRazerSdkInitialization()
         println(initResponse)
         sessionUri = initResponse.uri
-    }
 
-    @InternalCoroutinesApi
-    suspend fun run() = coroutineScope{
         var ticksWithoutHeartbeat = 0
         while (isActive){
-            if(ticksWithoutHeartbeat * LOOP_INITERVAL_MILLIS >= HEARBEAT_INTERVAL_MILLIS){
+            if(ticksWithoutHeartbeat * LOOP_INITERVAL_MILLIS >= HEARTBEAT_INTERVAL_MILLIS){
                 launch { callHeartbeatEndpoint() }
                 ticksWithoutHeartbeat = 0
             }else{

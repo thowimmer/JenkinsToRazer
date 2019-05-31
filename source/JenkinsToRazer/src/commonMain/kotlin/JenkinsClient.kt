@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 
-class JenkinsClient(val config : JenkinsConfiguration) {
+class JenkinsClient(private val config : JenkinsConfiguration) {
 
     @UseExperimental(UnstableDefault::class)
     val client = HttpClient {
@@ -24,13 +24,10 @@ class JenkinsClient(val config : JenkinsConfiguration) {
 
     @UseExperimental(InternalAPI::class)
     suspend fun getBuildInfoOfLastJob() : LastJobBuildInfo{
-        val buildInfo : LastJobBuildInfo = client.get {
+        return client.get {
             url(getLastSuccessfulBuildUrl(config.url, config.job.id))
             header("Authorization", "Basic " + "${config.auth.username}:${config.auth.password}".encodeBase64())
         }
-        client.close()
-
-        return buildInfo
     }
 
     private fun getLastSuccessfulBuildUrl(jenkinsUrl : String, jobId : String) : Url = Url("https://$jenkinsUrl/job/$jobId/lastBuild/api/json?tree=id,building,result,timestamp,duration,estimatedDuration,url")

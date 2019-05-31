@@ -1,26 +1,27 @@
-import kotlinx.cinterop.*
-import kotlinx.coroutines.*
-import platform.posix.*
+import kotlinx.cinterop.ByteVar
+import kotlinx.cinterop.allocArray
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.toKString
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import platform.posix.fclose
+import platform.posix.fgets
+import platform.posix.fopen
+import platform.posix.getenv
 
 @InternalCoroutinesApi
 fun main(){
     runBlocking {
-        val razerClient = RazerClient()
-        razerClient.init()
-        razerClient.setBackgroundColor("333333")
+        val configurationLoader = ConfigurationLoader()
+        val configProperties = configurationLoader.loadConfigurationProperties()
+        val jenkinsClient = JenkinsClient(configProperties.jenkins)
 
-        launch {
-            razerClient.run()
-        }
+        val chromaSdkBuildIndicator = ChromaSdkBuildIndicator(RazerClient())
+        launch { chromaSdkBuildIndicator.run("333333") }
 
-        launch {
-            var on = false
-            while (isActive){
-                razerClient.setKey(if (on) "00FF00" else "000000", 0, 3)
-                on = !on
-                delay(500)
-            }
-        }
+        val jenkinsToRazerJob = JenkinsToRazerJob(jenkinsClient, chromaSdkBuildIndicator)
+        launch { jenkinsToRazerJob.run() }
     }
 }
 
