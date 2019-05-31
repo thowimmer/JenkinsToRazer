@@ -8,6 +8,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import kotlinx.coroutines.*
+import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
@@ -37,7 +38,7 @@ class RazerClient {
     }
 
     @InternalCoroutinesApi
-    suspend fun run() = coroutineScope{
+    suspend fun run() {
         val initResponse = callRazerSdkInitialization()
         println(initResponse)
         sessionUri = initResponse.uri
@@ -45,7 +46,7 @@ class RazerClient {
         var ticksWithoutHeartbeat = 0
         while (isActive){
             if(ticksWithoutHeartbeat * LOOP_INITERVAL_MILLIS >= HEARTBEAT_INTERVAL_MILLIS){
-                launch { callHeartbeatEndpoint() }
+                callHeartbeatEndpoint()
                 ticksWithoutHeartbeat = 0
             }else{
                 ticksWithoutHeartbeat++

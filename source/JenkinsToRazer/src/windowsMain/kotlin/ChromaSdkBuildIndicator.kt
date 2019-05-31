@@ -1,18 +1,26 @@
 import kotlinx.coroutines.*
 
-private const val COLOR_BLINKING_ON = "fff600"
+private const val COLOR_BLINKING_ON = "ffff00"
 private const val COLOR_BLINKING_OFF = "000000"
-private const val COLOR_STATIC_BUILD_SUCCESS = "00FF00"
-private const val COLOR_STATIC_BUILD_FAILED = "0000FF"
+private const val COLOR_STATIC_BUILD_SUCCESS = "00ff00"
+private const val COLOR_STATIC_BUILD_FAILED = "ff0000"
 
 class ChromaSdkBuildIndicator(private val razerClient: RazerClient) : BuildIndicator {
 
-    lateinit var blinkJob: Job
+    private lateinit var blinkJob : Job
+    private lateinit var buildIndicatorScope: CoroutineScope
 
     @InternalCoroutinesApi
     suspend fun run(backgroundColorHex: String) {
-        razerClient.setBackgroundColor(backgroundColorHex)
-        razerClient.run()
+        coroutineScope {
+            buildIndicatorScope = this
+
+            razerClient.setBackgroundColor(backgroundColorHex)
+
+            launch {
+                razerClient.run()
+            }
+        }
     }
 
     override suspend fun buildStarted() {
@@ -22,19 +30,19 @@ class ChromaSdkBuildIndicator(private val razerClient: RazerClient) : BuildIndic
 
     override suspend fun buildFailed() {
         cancelBlinking()
-        setStaticColor(COLOR_STATIC_BUILD_SUCCESS)
+        setStaticColor(COLOR_STATIC_BUILD_FAILED)
     }
 
     override suspend fun buildSucceeded() {
         cancelBlinking()
-        setStaticColor(COLOR_STATIC_BUILD_FAILED)
+        setStaticColor(COLOR_STATIC_BUILD_SUCCESS)
     }
 
-    private suspend fun startBlinking() = coroutineScope{
-        blinkJob = launch {
+    private fun startBlinking() {
+        blinkJob = buildIndicatorScope.launch {
             var on = false
 
-            while (isActive){
+            while (isActive) {
                 razerClient.setKey(if (on) COLOR_BLINKING_ON else COLOR_BLINKING_OFF, 0, 3)
                 on = !on
                 delay(500)

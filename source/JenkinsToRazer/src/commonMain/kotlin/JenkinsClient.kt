@@ -39,6 +39,6 @@ data class LastJobBuildInfo(
         val url: String,
         val timestamp: Long,
         val building: Boolean,
-        val result: String,
+        val result: String?,
         val duration: Long,
         val estimatedDuration: Long)

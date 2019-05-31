@@ -2,7 +2,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.delay
 
-private const val JENKINS_POLLING_INTERVAL_MILLIS = 2000L
+private const val JENKINS_POLLING_INTERVAL_MILLIS = 5000L
 
 class JenkinsToRazerJob(
         private val jenkinsClient: JenkinsClient,
@@ -31,8 +31,8 @@ class JenkinsToRazerJob(
 
     private suspend fun publishUpdatedBuildStatus(oldJobInfo: LastJobBuildInfo, newJobInfo: LastJobBuildInfo) {
         when {
-            oldJobInfo.building && newJobInfo.result == "SUCCESS" -> buildIndicator.buildSucceeded()
-            oldJobInfo.building && newJobInfo.result == "UNSTABLE" -> buildIndicator.buildFailed()
+            oldJobInfo.building && !newJobInfo.building && newJobInfo.result == "SUCCESS" -> buildIndicator.buildSucceeded()
+            oldJobInfo.building && !newJobInfo.building && newJobInfo.result == "UNSTABLE" -> buildIndicator.buildFailed()
         }
     }
 
