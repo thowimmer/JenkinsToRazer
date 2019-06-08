@@ -1,15 +1,8 @@
 import kotlinx.cinterop.*
-import kotlinx.coroutines.runBlocking
 import platform.posix.*
 
 fun main(){
-    runBlocking {
-        val configurationLoader = ConfigurationLoader()
-        val configProperties = configurationLoader.loadConfigurationProperties()
-        val client = JenkinsClient(configProperties.jenkins)
-        val buildInfo = client.getBuildInfoOfLastJob()
-        print(buildInfo)
-    }
+    //TODO Linux implementation
 }
 
 actual fun loadConfigurationPropertiesJson(): String = readTextContent(getConfigurationFilePath())
