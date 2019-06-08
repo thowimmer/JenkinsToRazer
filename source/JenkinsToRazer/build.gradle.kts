@@ -2,7 +2,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 val ktorVersion = "1.1.5"
 val kotlinxSerializationVersion = "0.11.0"
-
+val kotlinxCoroutinesVersion = "1.3.0-M1"
 
 plugins {
     id("kotlin-multiplatform") version "1.3.31"
@@ -37,6 +37,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation("io.ktor:ktor-client-json:$ktorVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$kotlinxSerializationVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$kotlinxCoroutinesVersion")
             }
         }
 
@@ -45,6 +46,7 @@ kotlin {
             dependencies {
                 implementation("io.ktor:ktor-client-curl:$ktorVersion")
                 implementation("io.ktor:ktor-client-json-native:$ktorVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-linuxx64:$kotlinxCoroutinesVersion")
             }
         }
 
@@ -54,6 +56,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-curl:$ktorVersion")
                 implementation("io.ktor:ktor-client-json-native:$ktorVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:$kotlinxSerializationVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-windowsx64:$kotlinxCoroutinesVersion")
             }
         }
     }
