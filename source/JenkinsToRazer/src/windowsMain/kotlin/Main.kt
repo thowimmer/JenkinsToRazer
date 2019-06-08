@@ -15,7 +15,7 @@ fun main(){
     runBlocking {
         val configurationLoader = ConfigurationLoader()
         val configProperties = configurationLoader.loadConfigurationProperties()
-        val jenkinsClient = JenkinsClient(configProperties.jenkins)
+        val jenkinsClient = JenkinsClient(configProperties)
 
         val chromaSdkBuildIndicator = ChromaSdkBuildIndicator(RazerClient())
         launch { chromaSdkBuildIndicator.run("333333") }

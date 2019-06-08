@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 
-class JenkinsClient(private val config : JenkinsConfiguration) {
+class JenkinsClient(private val config : ConfigurationProperties) {
 
     @UseExperimental(UnstableDefault::class)
     val client = HttpClient {
@@ -25,12 +25,15 @@ class JenkinsClient(private val config : JenkinsConfiguration) {
     @UseExperimental(InternalAPI::class)
     suspend fun getBuildInfoOfLastJob() : LastJobBuildInfo{
         return client.get {
-            url(getLastSuccessfulBuildUrl(config.url, config.job.id))
+            url(getLastSuccessfulBuildUrl(config.url, config.buildJobs[0].job, config.buildJobs[0].branch))
             header("Authorization", "Basic " + "${config.auth.username}:${config.auth.password}".encodeBase64())
         }
     }
 
-    private fun getLastSuccessfulBuildUrl(jenkinsUrl : String, jobId : String) : Url = Url("https://$jenkinsUrl/job/$jobId/lastBuild/api/json?tree=id,building,result,timestamp,duration,estimatedDuration,url")
+    private fun getLastSuccessfulBuildUrl(jenkinsUrl : String, jobId : String, branch: String) : Url {
+        val multiBranchJob = if(branch.isEmpty())"" else "/job/$branch"
+        return Url("https://$jenkinsUrl/job/$jobId$multiBranchJob/lastBuild/api/json?tree=id,building,result,timestamp,duration,estimatedDuration,url")
+    }
 }
 
 @Serializable

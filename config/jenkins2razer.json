@@ -1,12 +1,45 @@
 {
-  "jenkins": {
-    "url": "some.jenkins.url/somepath",
-    "auth": {
-      "username": "someuser",
-      "password": "somepassword"
-    },
-    "job": {
-      "id": "some-job-id"
+  "url": "<my.jenkins.url>",
+  "auth": {
+    "username": "<jenkinsUser>",
+    "password": "<jenkinsApiTokenOrPassword>"
+  },
+  "razer": {
+    "backgroundEffect": "staticGray"
+  },
+  "buildJobs": [
+    {
+        "id": 1,
+        "job": "<idOfJenkinsJob>",
+        "branch": "<optionalBranchName>",
+        "keyColumn": 0,
+        "keyRow": 0,
+        "buildInProgressEffect": "blinkYellow",
+        "buildSuccessfulEffect": "staticGreen",
+        "buildFailedEffect":"staticRed"
     }
-  }
+  ],
+  "effects":[
+    {
+      "id": "staticGray",
+      "type": "STATIC",
+      "rgbHex": "333333"
+    },
+    {
+      "id": "blinkYellow",
+      "type": "BLINK",
+      "rgbOnHex": "ffff00",
+      "rgbOffHex": "000000"
+    },
+    {
+      "id": "staticGreen",
+      "type": "STATIC",
+      "rgbHex": "00ff00"
+    },
+    {
+      "id": "staticRed",
+      "type": "STATIC",
+      "rgbHex": "ff0000"
+    }
+  ]
 }
