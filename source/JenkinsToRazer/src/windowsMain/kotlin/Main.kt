@@ -20,7 +20,7 @@ fun main(){
         val chromaSdkBuildIndicator = ChromaSdkBuildIndicator(RazerClient())
         launch { chromaSdkBuildIndicator.run("333333") }
 
-        val jenkinsToRazerJob = JenkinsToRazerJob(jenkinsClient, chromaSdkBuildIndicator)
+        val jenkinsToRazerJob = JenkinsToRazerJob(jenkinsClient, chromaSdkBuildIndicator, configProperties)
         launch { jenkinsToRazerJob.run() }
     }
 }

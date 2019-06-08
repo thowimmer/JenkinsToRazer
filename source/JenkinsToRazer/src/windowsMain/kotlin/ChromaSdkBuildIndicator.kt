@@ -23,17 +23,17 @@ class ChromaSdkBuildIndicator(private val razerClient: RazerClient) : BuildIndic
         }
     }
 
-    override suspend fun buildStarted() {
+    override suspend fun buildStarted(buildJobId: Int) {
         cancelBlinking()
         startBlinking()
     }
 
-    override suspend fun buildFailed() {
+    override suspend fun buildFailed(buildJobId: Int) {
         cancelBlinking()
         setStaticColor(COLOR_STATIC_BUILD_FAILED)
     }
 
-    override suspend fun buildSucceeded() {
+    override suspend fun buildSucceeded(buildJobId: Int) {
         cancelBlinking()
         setStaticColor(COLOR_STATIC_BUILD_SUCCESS)
     }

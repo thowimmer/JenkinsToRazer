@@ -2,51 +2,56 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.delay
 
-private const val JENKINS_POLLING_INTERVAL_MILLIS = 5000L
-
 class JenkinsToRazerJob(
         private val jenkinsClient: JenkinsClient,
-        private val buildIndicator: BuildIndicator){
+        private val buildIndicator: BuildIndicator,
+        private val config: ConfigurationProperties){
 
-    private lateinit var currentBuildInfo : LastJobBuildInfo
+    private var buildJobInfoCache : MutableMap<Int, BuildInfo> = mutableMapOf()
 
     @InternalCoroutinesApi
     suspend fun run(){
         while (isActive){
-            val newJobInfo = jenkinsClient.getBuildInfoOfLastJob()
 
-            if (::currentBuildInfo.isInitialized && currentBuildInfo.id == newJobInfo.id) {
-                println("Same job")
-                publishUpdatedBuildStatus(currentBuildInfo, newJobInfo)
-            } else {
-                println("New Job detected")
-                publishNewBuildStatus(newJobInfo)
+            println("Checking build status...")
+
+            config.buildJobs.forEach { buildJob ->
+                val newBuildInfo = jenkinsClient.getLatestBuildInfo(buildJob.job, buildJob.branch)
+                val currentBuildInfo = buildJobInfoCache[buildJob.id]
+
+                if (currentBuildInfo != null && currentBuildInfo.id == newBuildInfo.id) {
+                    println("No Update for BuildJob ${buildJob.id}")
+                    publishUpdatedBuildStatus(buildJob.id, currentBuildInfo, newBuildInfo)
+                } else {
+                    println("Update for BuildJob ${buildJob.id}")
+                    publishNewBuildStatus(buildJob.id, newBuildInfo)
+                }
+
+                buildJobInfoCache[buildJob.id] = newBuildInfo
             }
 
-            currentBuildInfo = newJobInfo
-
-            delay(JENKINS_POLLING_INTERVAL_MILLIS)
+            delay(config.pollingIntervalMs)
         }
     }
 
-    private suspend fun publishUpdatedBuildStatus(oldJobInfo: LastJobBuildInfo, newJobInfo: LastJobBuildInfo) {
+    private suspend fun publishUpdatedBuildStatus(buildJobId: Int, oldBuildInfo: BuildInfo, newBuildInfo: BuildInfo) {
         when {
-            oldJobInfo.building && !newJobInfo.building && newJobInfo.result == "SUCCESS" -> buildIndicator.buildSucceeded()
-            oldJobInfo.building && !newJobInfo.building && newJobInfo.result == "UNSTABLE" -> buildIndicator.buildFailed()
+            oldBuildInfo.building && !newBuildInfo.building && newBuildInfo.result == "SUCCESS" -> buildIndicator.buildSucceeded(buildJobId)
+            oldBuildInfo.building && !newBuildInfo.building && newBuildInfo.result == "UNSTABLE" -> buildIndicator.buildFailed(buildJobId)
         }
     }
 
-    private suspend fun publishNewBuildStatus(newJobInfo: LastJobBuildInfo) {
+    private suspend fun publishNewBuildStatus(buildJobId: Int, newBuildInfo: BuildInfo) {
         when {
-            newJobInfo.building -> buildIndicator.buildStarted()
-            newJobInfo.result == "SUCCESS" -> buildIndicator.buildSucceeded()
-            newJobInfo.result == "UNSTABLE" -> buildIndicator.buildFailed()
+            newBuildInfo.building -> buildIndicator.buildStarted(buildJobId)
+            newBuildInfo.result == "SUCCESS" -> buildIndicator.buildSucceeded(buildJobId)
+            newBuildInfo.result == "UNSTABLE" -> buildIndicator.buildFailed(buildJobId)
         }
     }
 }
 
 interface BuildIndicator{
-    suspend fun buildStarted()
-    suspend fun buildFailed()
-    suspend fun buildSucceeded()
+    suspend fun buildStarted(buildJobId: Int)
+    suspend fun buildFailed(buildJobId: Int)
+    suspend fun buildSucceeded(buildJobId: Int)
 }

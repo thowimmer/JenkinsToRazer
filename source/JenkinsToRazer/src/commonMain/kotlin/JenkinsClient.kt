@@ -17,15 +17,15 @@ class JenkinsClient(private val config : ConfigurationProperties) {
     val client = HttpClient {
         install(JsonFeature) {
             serializer = KotlinxSerializer(Json.nonstrict).apply {
-                setMapper(LastJobBuildInfo::class, LastJobBuildInfo.serializer())
+                setMapper(BuildInfo::class, BuildInfo.serializer())
             }
         }
     }
 
     @UseExperimental(InternalAPI::class)
-    suspend fun getBuildInfoOfLastJob() : LastJobBuildInfo{
+    suspend fun getLatestBuildInfo(jobId: String, branch: String) : BuildInfo{
         return client.get {
-            url(getLastSuccessfulBuildUrl(config.url, config.buildJobs[0].job, config.buildJobs[0].branch))
+            url(getLastSuccessfulBuildUrl(config.url, jobId, branch))
             header("Authorization", "Basic " + "${config.auth.username}:${config.auth.password}".encodeBase64())
         }
     }
@@ -37,7 +37,7 @@ class JenkinsClient(private val config : ConfigurationProperties) {
 }
 
 @Serializable
-data class LastJobBuildInfo(
+data class BuildInfo(
         val id: Long,
         val url: String,
         val timestamp: Long,

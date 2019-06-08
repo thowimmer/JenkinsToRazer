@@ -8,6 +8,7 @@ import kotlinx.serialization.modules.SerializersModule
 data class ConfigurationProperties(
         val url : String,
         val auth: AuthProperties,
+        val pollingIntervalMs: Long,
         val razer: RazerProperties,
         val buildJobs: List<BuildJobProperties>,
         val effects: List<Effect>)
