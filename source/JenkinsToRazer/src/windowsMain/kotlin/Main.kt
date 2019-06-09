@@ -17,8 +17,8 @@ fun main(){
         val configProperties = configurationLoader.loadConfigurationProperties()
         val jenkinsClient = JenkinsClient(configProperties)
 
-        val chromaSdkBuildIndicator = ChromaSdkBuildIndicator(RazerClient())
-        launch { chromaSdkBuildIndicator.run("333333") }
+        val chromaSdkBuildIndicator = ChromaSdkBuildIndicator(RazerClient(), configProperties)
+        launch { chromaSdkBuildIndicator.run() }
 
         val jenkinsToRazerJob = JenkinsToRazerJob(jenkinsClient, chromaSdkBuildIndicator, configProperties)
         launch { jenkinsToRazerJob.run() }

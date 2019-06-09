@@ -1,60 +1,66 @@
 import kotlinx.coroutines.*
 
-private const val COLOR_BLINKING_ON = "ffff00"
-private const val COLOR_BLINKING_OFF = "000000"
-private const val COLOR_STATIC_BUILD_SUCCESS = "00ff00"
-private const val COLOR_STATIC_BUILD_FAILED = "ff0000"
+class ChromaSdkBuildIndicator(private val razerClient: RazerClient, private val config: ConfigurationProperties) : BuildIndicator {
 
-class ChromaSdkBuildIndicator(private val razerClient: RazerClient) : BuildIndicator {
-
-    private lateinit var blinkJob : Job
-    private lateinit var buildIndicatorScope: CoroutineScope
+    private val activeBlinkEffects : MutableMap<Int, BlinkEffectConfiguration> = mutableMapOf()
 
     @InternalCoroutinesApi
-    suspend fun run(backgroundColorHex: String) {
+    suspend fun run() {
         coroutineScope {
-            buildIndicatorScope = this
 
-            razerClient.setBackgroundColor(backgroundColorHex)
+            razerClient.setBackgroundColor(config.razer.backgroundEffect.rgbHex)
 
             launch {
                 razerClient.run()
+            }
+
+            launch {
+                var on = false
+
+                while (isActive) {
+                    for(blinkConfig in activeBlinkEffects.values){
+                        razerClient.setKey(
+                                if (on) blinkConfig.blinkEffect.rgbOnHex else blinkConfig.blinkEffect.rgbOnHex,
+                                blinkConfig.keyRow,
+                                blinkConfig.keyColumn)
+                    }
+                    on = !on
+                    delay(500)
+                }
             }
         }
     }
 
     override suspend fun buildStarted(buildJobId: Int) {
-        cancelBlinking()
-        startBlinking()
+        val jobConfig = config.jobs.getValue(buildJobId)
+        setEffect(buildJobId, jobConfig.keyRow, jobConfig.keyColumn, jobConfig.buildInProgressEffect)
     }
 
     override suspend fun buildFailed(buildJobId: Int) {
-        cancelBlinking()
-        setStaticColor(COLOR_STATIC_BUILD_FAILED)
+        val jobConfig = config.jobs.getValue(buildJobId)
+        setEffect(buildJobId, jobConfig.keyRow, jobConfig.keyColumn, jobConfig.buildFailedEffect)
     }
 
     override suspend fun buildSucceeded(buildJobId: Int) {
-        cancelBlinking()
-        setStaticColor(COLOR_STATIC_BUILD_SUCCESS)
+        val jobConfig = config.jobs.getValue(buildJobId)
+        setEffect(buildJobId, jobConfig.keyRow, jobConfig.keyColumn, jobConfig.buildSuccessfulEffect)
     }
 
-    private fun startBlinking() {
-        blinkJob = buildIndicatorScope.launch {
-            var on = false
+    private fun setEffect(buildJobId: Int, keyRow : Int, keyColumn: Int, effect: Effect) {
+       when(effect){
+           is StaticEffect -> {
+               activeBlinkEffects.remove(buildJobId)
+               razerClient.setKey(effect.rgbHex, keyRow, keyColumn)
+           }
 
-            while (isActive) {
-                razerClient.setKey(if (on) COLOR_BLINKING_ON else COLOR_BLINKING_OFF, 0, 3)
-                on = !on
-                delay(500)
-            }
-        }
-    }
-
-    private fun cancelBlinking() {
-        if (::blinkJob.isInitialized && blinkJob.isActive) blinkJob.cancel()
-    }
-
-    private fun setStaticColor(colorHex: String){
-        razerClient.setKey(colorHex, 0, 3)
+           is BlinkEffect -> {
+               activeBlinkEffects[buildJobId] = BlinkEffectConfiguration(keyRow, keyColumn, effect)
+           }
+       }
     }
 }
+
+private class BlinkEffectConfiguration(
+        val keyRow: Int,
+        val keyColumn: Int,
+        val blinkEffect: BlinkEffect)

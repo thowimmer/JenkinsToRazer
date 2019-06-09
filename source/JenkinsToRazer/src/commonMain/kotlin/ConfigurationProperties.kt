@@ -5,7 +5,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 
 @Serializable
-data class ConfigurationProperties(
+private data class DeserializedConfigurationProperties(
         val url : String,
         val auth: AuthProperties,
         val pollingIntervalMs: Long,
@@ -23,7 +23,7 @@ data class RazerProperties(
         val backgroundEffect: String)
 
 @Serializable
-data class BuildJobProperties(
+private data class BuildJobProperties(
         val id: Int,
         val job: String,
         val branch: String,
@@ -47,13 +47,67 @@ data class BlinkEffect(override val id: String, val rgbOnHex: String, val rgbOff
 
 class ConfigurationLoader {
     fun loadConfigurationProperties() : ConfigurationProperties {
-        val effectModule = SerializersModule {
-            polymorphic(Effect::class) {
-                StaticEffect::class with StaticEffect.serializer()
-                BlinkEffect::class with BlinkEffect.serializer()
-            }
-        }
         val configurationPropertiesJson = loadConfigurationPropertiesJson()
-        return Json(context = effectModule).parse(ConfigurationProperties.serializer(), configurationPropertiesJson)
+        val deserializedConfigurationProperties = deserializeConfigurationProperties(configurationPropertiesJson)
+        return mapDeserializedConfigurationProperties(deserializedConfigurationProperties)
     }
 }
+
+private fun deserializeConfigurationProperties(configurationPropertiesJson : String) : DeserializedConfigurationProperties {
+    val effectModule = SerializersModule {
+        polymorphic(Effect::class) {
+            StaticEffect::class with StaticEffect.serializer()
+            BlinkEffect::class with BlinkEffect.serializer()
+        }
+    }
+    return Json(context = effectModule).parse(DeserializedConfigurationProperties.serializer(), configurationPropertiesJson)
+}
+
+private fun mapDeserializedConfigurationProperties(inputProperties: DeserializedConfigurationProperties) : ConfigurationProperties {
+    val effects  = inputProperties.effects.map { it.id to it }.toMap()
+
+    fun getEffect(effectId: String) : Effect = effects[effectId] ?: throw IllegalArgumentException("Unknown effect $effectId")
+
+    val jobConfiguration = inputProperties.buildJobs.map { it.id to
+        JobConfigurationProperties(
+            it.job,
+            it.branch,
+            it.keyRow,
+            it.keyColumn,
+            getEffect(it.buildInProgressEffect),
+            getEffect(it.buildSuccessfulEffect),
+            getEffect(it.buildFailedEffect)
+    )}.toMap()
+
+    val backgroundEffect = getEffect(inputProperties.razer.backgroundEffect) as? StaticEffect
+            ?: throw IllegalArgumentException("Only static background effects are supported at the moment.")
+
+    val razerConfiguration = RazerConfigurationProperties(backgroundEffect)
+
+    return ConfigurationProperties(
+            inputProperties.url,
+            inputProperties.auth,
+            inputProperties.pollingIntervalMs,
+            razerConfiguration,
+            jobConfiguration)
+}
+
+data class ConfigurationProperties (
+        val url : String,
+        val auth: AuthProperties,
+        val pollingIntervalMs: Long,
+        val razer: RazerConfigurationProperties,
+        val jobs : Map<Int, JobConfigurationProperties>
+)
+
+data class RazerConfigurationProperties(
+        val backgroundEffect: StaticEffect)
+
+data class JobConfigurationProperties(
+        val job: String,
+        val branch: String,
+        val keyRow: Int,
+        val keyColumn: Int,
+        val buildInProgressEffect: Effect,
+        val buildSuccessfulEffect: Effect,
+        val buildFailedEffect: Effect)

@@ -15,19 +15,19 @@ class JenkinsToRazerJob(
 
             println("Checking build status...")
 
-            config.buildJobs.forEach { buildJob ->
-                val newBuildInfo = jenkinsClient.getLatestBuildInfo(buildJob.job, buildJob.branch)
-                val currentBuildInfo = buildJobInfoCache[buildJob.id]
+            for ((jobId, jobConfig) in config.jobs) {
+                val newBuildInfo = jenkinsClient.getLatestBuildInfo(jobConfig.job, jobConfig.branch)
+                val currentBuildInfo = buildJobInfoCache[jobId]
 
                 if (currentBuildInfo != null && currentBuildInfo.id == newBuildInfo.id) {
-                    println("No Update for BuildJob ${buildJob.id}")
-                    publishUpdatedBuildStatus(buildJob.id, currentBuildInfo, newBuildInfo)
+                    println("No Update for BuildJob $jobId")
+                    publishUpdatedBuildStatus(jobId, currentBuildInfo, newBuildInfo)
                 } else {
-                    println("Update for BuildJob ${buildJob.id}")
-                    publishNewBuildStatus(buildJob.id, newBuildInfo)
+                    println("Update for BuildJob $jobId")
+                    publishNewBuildStatus(jobId, newBuildInfo)
                 }
 
-                buildJobInfoCache[buildJob.id] = newBuildInfo
+                buildJobInfoCache[jobId] = newBuildInfo
             }
 
             delay(config.pollingIntervalMs)
