@@ -20,7 +20,7 @@ class ChromaSdkBuildIndicator(private val razerClient: RazerClient, private val 
                 while (isActive) {
                     for(blinkConfig in activeBlinkEffects.values){
                         razerClient.setKey(
-                                if (on) blinkConfig.blinkEffect.rgbOnHex else blinkConfig.blinkEffect.rgbOnHex,
+                                if (on) blinkConfig.blinkEffect.rgbOnHex else blinkConfig.blinkEffect.rgbOffHex,
                                 blinkConfig.keyRow,
                                 blinkConfig.keyColumn)
                     }
