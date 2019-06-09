@@ -23,15 +23,15 @@ class JenkinsClient(private val config : ConfigurationProperties) {
     }
 
     @UseExperimental(InternalAPI::class)
-    suspend fun getLatestBuildInfo(jobId: String, branch: String) : BuildInfo{
+    suspend fun getLatestBuildInfo(jobId: String, branch: String?) : BuildInfo{
         return client.get {
             url(getLastSuccessfulBuildUrl(config.url, jobId, branch))
             header("Authorization", "Basic " + "${config.auth.username}:${config.auth.password}".encodeBase64())
         }
     }
 
-    private fun getLastSuccessfulBuildUrl(jenkinsUrl : String, jobId : String, branch: String) : Url {
-        val multiBranchJob = if(branch.isEmpty())"" else "/job/$branch"
+    private fun getLastSuccessfulBuildUrl(jenkinsUrl : String, jobId : String, branch: String?) : Url {
+        val multiBranchJob = if(branch.isNullOrEmpty()) "" else "/job/$branch"
         return Url("https://$jenkinsUrl/job/$jobId$multiBranchJob/lastBuild/api/json?tree=id,building,result,timestamp,duration,estimatedDuration,url")
     }
 }

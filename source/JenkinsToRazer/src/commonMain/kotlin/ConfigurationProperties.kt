@@ -26,7 +26,7 @@ data class RazerProperties(
 private data class BuildJobProperties(
         val id: Int,
         val job: String,
-        val branch: String,
+        val branch: String? = null,
         val keyColumn: Int,
         val keyRow: Int,
         val buildInProgressEffect: String,
@@ -105,7 +105,7 @@ data class RazerConfigurationProperties(
 
 data class JobConfigurationProperties(
         val job: String,
-        val branch: String,
+        val branch: String? = null,
         val keyRow: Int,
         val keyColumn: Int,
         val buildInProgressEffect: Effect,
