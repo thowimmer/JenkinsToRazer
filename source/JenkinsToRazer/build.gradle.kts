@@ -7,12 +7,14 @@ val kotlinxCoroutinesVersion = "1.3.0-M2"
 plugins {
     id("kotlin-multiplatform") version "1.3.40"
     id("kotlinx-serialization") version "1.3.40"
+    id("io.github.robwin.jgitflow") version "0.6.0"
 }
 
 repositories {
     mavenCentral()
     maven { url = uri("https://kotlin.bintray.com/ktor") }
     maven { url = uri("https://kotlin.bintray.com/kotlinx") }
+    maven { url = uri("https://dl.bintray.com/robwin") }
 }
 
 kotlin {
