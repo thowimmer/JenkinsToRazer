@@ -80,6 +80,7 @@ class RazerClient {
     private suspend fun callHeartbeatEndpoint() {
         client.call("$sessionUri/heartbeat"){
             method = HttpMethod.Put
+            body = ""
         }
     }
 
