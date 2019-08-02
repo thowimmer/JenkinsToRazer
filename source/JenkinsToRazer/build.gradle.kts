@@ -21,14 +21,18 @@ kotlin {
     linuxX64("linux") {
         binaries {
             if(Os.isFamily(Os.FAMILY_UNIX)){
-                executable()
+                executable{
+                    baseName = "JenkinsToRazer"
+                }
             }
         }
     }
 
     mingwX64("windows") {
         binaries {
-            executable()
+            executable{
+                baseName = "JenkinsToRazer"
+            }
         }
     }
 
