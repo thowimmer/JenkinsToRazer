@@ -1,8 +1,8 @@
 #!/bin/bash
 docker run -it --rm --cap-add SYS_PTRACE \
            -v "$PWD:/work:delegated" \
-           -v docker-kotlin-native-mp_wine:/home/.user_wine \
+           -v docker-kotlin-native-mp_wine-home:/home/.user_wine \
+           -e TARGETS='mingwX64' \
       	   -e MSYS2_PACKAGES='mingw-w64-x86_64-curl' \
-           -e TARGETS='mingwX64;linuxX64' \
-           thowimmer/kotlin-native-mp:latest \
+           thowimmer/kotlin-native-multiplatform:latest \
            root -c "gosu user wineconsole gradlew.bat --no-daemon $*"
