@@ -1,5 +1,5 @@
 #!/bin/bash
-docker run  --rm --cap-add SYS_PTRACE \
+docker run --rm --cap-add SYS_PTRACE \
            -v "$PWD:/work:delegated" \
            -v docker-kotlin-native-mp_wine-home:/home/.user_wine \
            -e TARGETS='mingwX64' \
