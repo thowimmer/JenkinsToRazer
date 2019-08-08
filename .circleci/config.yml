@@ -7,3 +7,7 @@ jobs:
        - checkout
        - run: cd source/JenkinsToRazer
        - run: ./gradlew_win linkReleaseExecutableWindows
+       - run:
+           command: |
+               cd source/JenkinsToRazer
+               ./gradlew_win linkReleaseExecutableWindows
