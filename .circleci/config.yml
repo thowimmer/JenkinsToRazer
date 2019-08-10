@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  build:
+  build_windows_release_executable:
     machine:
       image: ubuntu-1604:201903-01
     steps:
@@ -9,3 +9,15 @@ jobs:
            command: |
                cd source/JenkinsToRazer
                ./gradlew_win linkReleaseExecutableWindows
+       - store_artifacts:
+           path: build/bin/windows/releaseExecutable
+
+workflows:
+  version: 2
+  build_and_upload_release_artifacts:
+    jobs:
+      - build_windows_release_executable:
+          filters:
+            branches:
+              only:
+                - develop
