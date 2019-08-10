@@ -2,6 +2,7 @@
 docker run --rm --cap-add SYS_PTRACE \
            -v "$PWD:/work:delegated" \
            -v docker-kotlin-native-mp_wine-home:/home/.user_wine \
+           -e USER_ID=`id -u` \
            -e TARGETS='mingwX64' \
       	   -e MSYS2_PACKAGES='mingw-w64-x86_64-curl' \
            thowimmer/kotlin-native-multiplatform:latest \
