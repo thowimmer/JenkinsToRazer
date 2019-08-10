@@ -13,14 +13,16 @@ jobs:
        - store_artifacts:
            path: /tmp/releaseArtifacts
        - persist_to_workspace:
-           root: /tmp/releaseArtifacts
+           root: /tmp
+           paths:
+             - releaseArtifacts/*
 
   publish_github_release:
     docker:
       - image: circleci/golang:1.8
     steps:
       - attach_workspace:
-          at: /tmp/release
+          at: /tmp/releaseArtifacts
       - run:
           name: "Publish Release on GitHub"
           command: |
