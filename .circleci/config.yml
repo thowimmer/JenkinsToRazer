@@ -9,16 +9,37 @@ jobs:
            command: |
                cd source/JenkinsToRazer
                ./gradlew_win linkReleaseExecutableWindows
-               cp -r build/bin/windows/releaseExecutable/ /tmp/artifacts
+               cp -r build/bin/windows/releaseExecutable/ /tmp/releaseArtifacts
        - store_artifacts:
-           path: /tmp/artifacts
-           
+           path: /tmp/releaseArtifacts
+       - persist_to_workspace:
+           root: /tmp/releaseArtifacts
+
+  publish_github_release:
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - attach_workspace:
+          at: /tmp/release
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            go get github.com/tcnksm/ghr
+            VERSION=${CIRCLE_TAG}
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} /tmp/releaseArtifacts
+
 workflows:
   version: 2
   build_and_upload_release_artifacts:
     jobs:
-      - build_windows_release_executable:
+      - build_windows_release_executable: &build_and_upload_release_artifacts_filter
           filters:
+            tags:
+              only: /^\d+\.\d+\.\d+$/
             branches:
               only:
-                - develop
+                - master
+      - publish_github_release:
+          requires:
+            - build_windows_release_executable
+          <<: *build_and_upload_release_artifacts_filter
