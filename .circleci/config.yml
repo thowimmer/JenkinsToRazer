@@ -9,9 +9,10 @@ jobs:
            command: |
                cd source/JenkinsToRazer
                ./gradlew_win linkReleaseExecutableWindows
+               cp -r build/bin/windows/releaseExecutable/ /tmp/artifacts
        - store_artifacts:
-           path: build/bin/windows/releaseExecutable
-
+           path: /tmp/artifacts
+           
 workflows:
   version: 2
   build_and_upload_release_artifacts:
