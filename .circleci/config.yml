@@ -37,6 +37,8 @@ workflows:
     jobs:
       - build_windows_release_executable: &build_release_artifacts_and_publish_release_draft_filter
           filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /^v\d+\.\d+\.\d+$/
       - publish_github_release_draft:
