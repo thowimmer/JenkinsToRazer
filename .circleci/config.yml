@@ -39,9 +39,6 @@ workflows:
           filters:
             tags:
               only: /^v\d+\.\d+\.\d+$/
-            branches:
-              only:
-                - master
       - publish_github_release_draft:
           requires:
             - build_windows_release_executable
