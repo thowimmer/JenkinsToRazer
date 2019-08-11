@@ -16,14 +16,15 @@ jobs:
        - persist_to_workspace:
            root: /tmp
            paths:
-             - releaseArtifacts/*
+             - releaseArtifacts
 
   publish_github_release_draft:
     docker:
       - image: circleci/golang:1.8
     steps:
       - attach_workspace:
-          at: /tmp/releaseArtifacts
+          at: /tmp
+      - run: ls -lrt /tmp/releaseArtifacts
       - run:
           name: "Publish Release Draft on GitHub"
           command: |
