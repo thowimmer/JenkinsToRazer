@@ -31,8 +31,31 @@ jobs:
             VERSION=${CIRCLE_TAG}
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -n ${VERSION} -draft ${VERSION} /tmp/releaseArtifacts
 
+  build_windows_debug_executable:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+       - checkout
+       - run:
+           name: "Build Windows debug artifact"
+           command: |
+               cd source/JenkinsToRazer
+               ./gradlew_win linkDebugExecutableWindows
+               cp -r build/bin/windows/debugExecutable/ /tmp/debugArtifacts
+       - store_artifacts:
+           path: /tmp/debugArtifacts
+
 workflows:
   version: 2
+  
+  develop_ci_build:
+    jobs:
+      - build_windows_debug_executable: &build_release_artifacts_and_publish_release_draft_filter
+          filters:
+            branches:
+              only:
+                - develop
+
   build_release_artifacts_and_publish_release_draft:
     jobs:
       - build_windows_release_executable: &build_release_artifacts_and_publish_release_draft_filter
