@@ -33,7 +33,7 @@ jobs:
 
 workflows:
   version: 2
-  build_release_artifact_and_publish_release_draft:
+  build_release_artifacts_and_publish_release_draft:
     jobs:
       - build_windows_release_executable: &build_and_upload_release_artifacts_filter
           filters:
