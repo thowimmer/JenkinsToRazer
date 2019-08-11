@@ -24,7 +24,6 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp
-      - run: ls -lrt /tmp/releaseArtifacts
       - run:
           name: "Publish Release Draft on GitHub"
           command: |
