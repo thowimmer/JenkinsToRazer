@@ -39,7 +39,10 @@ workflows:
           filters:
             tags:
               only: /^v\d+\.\d+\.\d+$/
+            branches:
+              only:
+                - master
       - publish_github_release_draft:
           requires:
-            - build_release_artifacts_and_publish_release_draft_filter
-          <<: *build_and_upload_release_artifacts_filter
+            - build_windows_release_executable
+          <<: *build_release_artifacts_and_publish_release_draft_filter
