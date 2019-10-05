@@ -11,25 +11,26 @@ jobs:
     runs-on: windows-latest
     steps:
 
-    - name: Setup MSYS2 Environment
-      run: |
-        choco install msys2
-        refreshenv
-        pacman -S --noconfirm mingw-w64-x86_64-curl
-      shell: cmd  
-
     - name: Checkout
       uses: actions/checkout@v1
 
+    - name: Setup MSYS2 Environment
+      shell: cmd
+      run: choco install msys2
+
+    - name: Install MinGW Packages
+      shell: cmd
+      run: pacman -S --noconfirm mingw-w64-x86_64-curl
+
     - name: Build Debug Executable
+      shell: cmd
       run: |
         cd source/JenkinsToRazer/
         gradlew linkDebugExecutableWindows
-        cd ../..
-      shell: cmd  
+        cd ../.. 
 
     - name: Store artifact
       uses: actions/upload-artifact@v1
       with:
-        name: DebugExecutable
+        name: JenkinsToRazer-Windows-${{ github.sha }}
         path: .source/JenkinsToRazer/build/bin/windows/debugExecutable/
