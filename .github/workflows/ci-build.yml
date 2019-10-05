@@ -14,13 +14,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
 
-    - name: Setup MinGW Environment
+    - name: Setup MSYS2 Environment
       shell: cmd
-      run: choco install mingw-get
+      run: choco install msys2
 
     - name: Install mingwX64 Packages
       shell: cmd
-      run: mingw-get install mingw-w64-x86_64-curl
+      run: C:\tools\msys64\usr\bin\pacman.exe -S --noconfirm mingw-w64-x86_64-curl
 
     - name: Build Debug Executable
       shell: cmd
