@@ -2,7 +2,7 @@ name: JenkinsToRazer CI Build
 
 on:
   push:
-    branches:    
+    branches:
       - develop
  
 jobs:
@@ -11,15 +11,20 @@ jobs:
     runs-on: windows-latest
     steps:
 
-    - name: Setup MSYS2
-      run: choco install msys2
+    - name: Setup MSYS2 Environment
+      run: |
+        choco install msys2
+        pacman -S --noconfirm mingw-w64-x86_64-curl
       shell: cmd  
 
     - name: Checkout
       uses: actions/checkout@v1
 
     - name: Build Debug Executable
-      run: ./source/JenkinsToRazer/gradlew linkDebugExecutableWindows
+      run: |
+        cd source/JenkinsToRazer/
+        gradlew linkDebugExecutableWindows
+        cd ../..
       shell: cmd  
 
     - name: Store artifact
