@@ -14,6 +14,7 @@ jobs:
     - name: Setup MSYS2 Environment
       run: |
         choco install msys2
+        refreshenv
         pacman -S --noconfirm mingw-w64-x86_64-curl
       shell: cmd  
 
