@@ -23,7 +23,7 @@ jobs:
       shell: cmd  
 
     - name: Store artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: DebugExecutable
-          path: .source/JenkinsToRazer/build/bin/windows/debugExecutable/
+      uses: actions/upload-artifact@v1
+      with:
+        name: DebugExecutable
+        path: .source/JenkinsToRazer/build/bin/windows/debugExecutable/
