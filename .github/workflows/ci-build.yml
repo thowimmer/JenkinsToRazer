@@ -13,7 +13,11 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v1
-      
+
+    - name: Setup MinGW Environment
+      shell: cmd
+      run: choco install mingw-get
+
     - name: Install mingwX64 Packages
       shell: cmd
       run: mingw-get install mingw-w64-x86_64-curl
