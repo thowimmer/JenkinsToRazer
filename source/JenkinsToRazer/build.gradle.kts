@@ -68,3 +68,9 @@ kotlin {
         }
     }
 }
+
+tasks {
+    initJGitflow{
+        versiontag = "v"
+    }
+}
