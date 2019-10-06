@@ -1,0 +1,36 @@
+name: JenkinsToRazer CI Build
+
+on:
+  push:
+    branches:
+      - develop
+ 
+jobs:
+  windows-ci-build:
+    name: Windows CI Build
+    runs-on: windows-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Setup MSYS2 Environment
+      shell: cmd
+      run: choco install msys2
+
+    - name: Install mingwX64 Packages
+      shell: cmd
+      run: C:\tools\msys64\usr\bin\pacman.exe -S --noconfirm mingw-w64-x86_64-curl
+
+    - name: Build Debug Executable
+      shell: cmd
+      run: |
+        cd source/JenkinsToRazer/
+        gradlew linkDebugExecutableWindows
+        cd ../.. 
+
+    - name: Store artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: JenkinsToRazer-Windows-${{ github.sha }}
+        path: source/JenkinsToRazer/build/bin/windows/debugExecutable/

@@ -15,6 +15,9 @@ pluginManagement {
             if (requested.id.id == "kotlinx-serialization") {
                 useModule("org.jetbrains.kotlin:kotlin-serialization:${requested.version}")
             }
+            if (requested.id.id == "io.github.robwin.jgitflow") {
+                useModule("io.github.robwin:jgitflow-gradle-plugin:${requested.version}")
+            }
         }
     }
 }

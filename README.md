@@ -1,6 +1,5 @@
 # JenkinsToRazer
-
-[![CircleCI](https://circleci.com/gh/thowimmer/JenkinsToRazer/tree/develop.svg?style=svg)](https://circleci.com/gh/thowimmer/JenkinsToRazer/tree/develop)
+[![GitHubActionsCIBuild](https://github.com/thowimmer/JenkinsToRazer/workflows/JenkinsToRazer%20CI%20Build/badge.svg)](https://github.com/thowimmer/JenkinsToRazer/actions?workflow=JenkinsToRazer%20CI%20Build)
 
 Visualize build status of Jenkins jobs on a Razer Chroma compatible keyboard.
 
