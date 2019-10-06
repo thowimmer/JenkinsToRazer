@@ -35,7 +35,7 @@ private data class BuildJobProperties(
 )
 
 @Serializable
-abstract class Effect(@Transient open val id: String)
+abstract class Effect(@Transient open val id: String = "")
 
 @SerialName("STATIC")
 @Serializable
