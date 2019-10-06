@@ -1,12 +1,12 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
-val ktorVersion = "1.2.2"
-val kotlinxSerializationVersion = "0.11.1"
-val kotlinxCoroutinesVersion = "1.3.0-M2"
+val ktorVersion = "1.2.5"
+val kotlinxSerializationVersion = "0.13.0"
+val kotlinxCoroutinesVersion = "1.3.2"
 
 plugins {
-    id("kotlin-multiplatform") version "1.3.40"
-    id("kotlinx-serialization") version "1.3.40"
+    id("kotlin-multiplatform") version "1.3.50"
+    id("kotlinx-serialization") version "1.3.50"
     id("io.github.robwin.jgitflow") version "0.6.0"
 }
 
